@@ -51,9 +51,9 @@ DELETE: Delete a SWIFT code:
 
 curl -X DELETE http://localhost:8080/v1/swift-codes/XXXXX
 
-###Example responses:
+### Example responses:
 
-#GET:
+# GET:
 
 {
   "swiftCode": "XXXXX",
@@ -64,35 +64,35 @@ curl -X DELETE http://localhost:8080/v1/swift-codes/XXXXX
   "isHeadquarter": true
 }
 
-#POST: Response on success:
+# POST: Response on success:
 
 {
   "message": "Swift code successfully added"
 }
 
-#DELETE: Response on success:
+# DELETE: Response on success:
 
 {
   "message": "Swift code successfully deleted"
 }
 
-###Unit testing
+### Unit testing
 
 Unit tests for business logic and endpoints are included in the repository. You can run them using the Go testing tool, for example, go test:
 
 go test ./...
 
-###Dependencies
+### Dependencies
 
 Go 1.21 or newer.
 
 PostgreSQL (or Docker with a PostgreSQL container).
 
-###Summary
+### Summary
 
 The application allows managing SWIFT code data via an API. You can run it locally or in a Docker container and test various endpoints using cURL or Postman.
 
-###What's included:
+### What's included:
 
 Docker installation and configuration – details on running the application and database in containers.
 
