@@ -43,17 +43,17 @@ Example cURL requests:
   ```bash
   curl http://localhost:8080/v1/swift-codes/XXXXX
 
-POST: Add a new SWIFT code:
+- **POST**: Add a new SWIFT code:
 
 curl -X POST -d '{"swiftCode": "XXXXX", "bankName": "Bank", "address": "Address", "countryISO2": "US", "countryName": "USA", "isHeadquarter": true}' http://localhost:8080/v1/swift-codes
 
-DELETE: Delete a SWIFT code:
+- **DELETE**: Delete a SWIFT code:
 
 curl -X DELETE http://localhost:8080/v1/swift-codes/XXXXX
 
 ### Example responses:
 
-# GET:
+- **GET**:
 
 {
   "swiftCode": "XXXXX",
@@ -64,13 +64,13 @@ curl -X DELETE http://localhost:8080/v1/swift-codes/XXXXX
   "isHeadquarter": true
 }
 
-# POST: Response on success:
+- **POST**: Response on success:
 
 {
   "message": "Swift code successfully added"
 }
 
-# DELETE: Response on success:
+- **DELETE**: Response on success:
 
 {
   "message": "Swift code successfully deleted"
