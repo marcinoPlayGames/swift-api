@@ -3,57 +3,57 @@ This is the repository for the swift-api home exercise.
 
 ## Swift API
 
-### Jak uruchomić aplikację:
+### How to run the application:
 
-1. **Lokalnie**:
-   1. Zainstaluj Go (wersja 1.21 lub nowsza).
-   2. Sklonuj repozytorium:
+1. **Locally**:
+   1. Install Go (version 1.21 or newer).
+   2. Clone the repository:
       ```bash
       git clone https://github.com/yourusername/swift-api.git
       cd swift-api
       ```
-   3. Zainstaluj zależności:
+   3. Install dependencies:
       ```bash
       go mod tidy
       ```
-   4. Uruchom komendę:
+   4. Run the command:
       ```bash
       go run main.go
       ```
-   5. Aplikacja będzie dostępna pod `http://localhost:8080`.
+   5. The application will be available at `http://localhost:8080`.
 
-2. **W Dockerze**:
-   1. Zainstaluj Docker i Docker Compose.
-   2. Sklonuj repozytorium:
+2. **With Docker**:
+   1. Install Docker and Docker Compose.
+   2. Clone the repository:
       ```bash
       git clone https://github.com/yourusername/swift-api.git
       cd swift-api
       ```
-   3. Uruchom aplikację i bazę danych w kontenerach:
+   3. Run the application and database in containers:
       ```bash
       docker-compose up --build
       ```
-   4. Aplikacja będzie dostępna pod `http://localhost:8080`.
+   4. The application will be available at `http://localhost:8080`.
 
-### Jak testować API:
+### How to test the API:
 
-Przykład zapytań cURL:
+Example cURL requests:
 
-- **GET**: Pobierz dane kodu SWIFT:
+- **GET**: Get SWIFT code data:
   ```bash
   curl http://localhost:8080/v1/swift-codes/XXXXX
 
-POST: Dodaj nowy kod SWIFT:
+POST: Add a new SWIFT code:
 
 curl -X POST -d '{"swiftCode": "XXXXX", "bankName": "Bank", "address": "Address", "countryISO2": "US", "countryName": "USA", "isHeadquarter": true}' http://localhost:8080/v1/swift-codes
 
-DELETE: Usuń kod SWIFT:
+DELETE: Delete a SWIFT code:
 
 curl -X DELETE http://localhost:8080/v1/swift-codes/XXXXX
 
-Przykład odpowiedzi:
+###Example responses:
 
-GET:
+#GET:
 
 {
   "swiftCode": "XXXXX",
@@ -64,35 +64,40 @@ GET:
   "isHeadquarter": true
 }
 
-POST: Odpowiedź w przypadku powodzenia:
+#POST: Response on success:
 
 {
   "message": "Swift code successfully added"
 }
 
-DELETE: Odpowiedź w przypadku powodzenia:
+#DELETE: Response on success:
 
 {
   "message": "Swift code successfully deleted"
 }
 
-Testowanie jednostkowe
-Testy jednostkowe dla logiki biznesowej i endpointów są zawarte w repozytorium. Można je uruchomić za pomocą narzędzia do testowania w Go, np. go test:
+###Unit testing
 
-go test ./…
+Unit tests for business logic and endpoints are included in the repository. You can run them using the Go testing tool, for example, go test:
 
-Zależności
+go test ./...
 
-Go 1.21 lub nowsza.
-PostgreSQL (lub Docker z kontenerem PostgreSQL).
+###Dependencies
 
-Podsumowanie
-Aplikacja umożliwia zarządzanie danymi kodów SWIFT poprzez API. Możesz uruchomić ją lokalnie lub w kontenerze Docker, a także testować różne endpointy przy użyciu cURL lub Postmana.
+Go 1.21 or newer.
 
-### Co dodano:
-1. **Instalacja i konfiguracja Docker** – szczegóły dotyczące uruchamiania aplikacji i bazy danych w kontenerach.
-2. **Więcej szczegółów na temat testów jednostkowych** – jak uruchomić testy w Go.
-3. **Przykłady odpowiedzi API** – użytkownik wie, czego się spodziewać po wysłaniu zapytania.
-4. **Instrukcje dotyczące zależności** – Go 1.21, PostgreSQL oraz Docker.
+PostgreSQL (or Docker with a PostgreSQL container).
 
-To sprawia, że README.md będzie kompletne i pełne, umożliwiając łatwe uruchomienie i testowanie aplikacji.
+###Summary
+
+The application allows managing SWIFT code data via an API. You can run it locally or in a Docker container and test various endpoints using cURL or Postman.
+
+###What's included:
+
+Docker installation and configuration – details on running the application and database in containers.
+
+More details on unit testing – how to run tests in Go.
+
+API response examples – the user knows what to expect after making a request.
+
+Instructions on dependencies – Go 1.21, PostgreSQL, and Docker.
