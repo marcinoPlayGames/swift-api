@@ -1,32 +1,32 @@
 package handlers
 
 import (
-	"encoding/json"  // Użycie tej biblioteki do kodowania odpowiedzi
+	"encoding/json"  // Using this library for encoding responses
 	"net/http"
 	"github.com/gin-gonic/gin"
 	"github.com/marcinoPlayGames/swift-api/models"
 )
 
-// Pobiera kod SWIFT po identyfikatorze
+// Retrieves a SWIFT code by its identifier
 func GetSwiftCode(c *gin.Context) {
 	swiftCode := c.Param("swiftCode")
 	for _, code := range swiftCodes {
 		if code.SwiftCode == swiftCode {
-			c.Header("Content-Type", "application/json")  // Ustalenie nagłówka odpowiedzi
-			json.NewEncoder(c.Writer).Encode(code)       // Użycie JSON do zakodowania odpowiedzi
+			c.Header("Content-Type", "application/json")  // Setting the response header
+			json.NewEncoder(c.Writer).Encode(code)       // Using JSON to encode the response
 			return
 		}
 	}
 	c.JSON(http.StatusNotFound, gin.H{"message": "Swift code not found"})
 }
 
-// Przykładowa struktura przechowująca dane SWIFT
+// Example structure for storing SWIFT data
 var swiftCodes = []models.SwiftCode{
 	{SwiftCode: "BANKPLPWXXX", BankName: "Bank Polska", Address: "Warszawa", CountryISO2: "PL", CountryName: "Polska", IsHeadquarter: true},
 	{SwiftCode: "BANKDEFFXXX", BankName: "Bank Niemcy", Address: "Berlin", CountryISO2: "DE", CountryName: "Niemcy", IsHeadquarter: true},
 }
 
-// Pobiera wszystkie kody SWIFT dla danego kraju
+// Retrieves all SWIFT codes for a given country
 func GetSwiftCodesByCountry(c *gin.Context) {
 	countryISO2 := c.Param("countryISO2code")
 	var countryCodes []models.SwiftCode
@@ -44,7 +44,7 @@ func GetSwiftCodesByCountry(c *gin.Context) {
 	c.JSON(http.StatusOK, countryCodes)
 }
 
-// Dodaje nowy kod SWIFT
+// Adds a new SWIFT code
 func AddSwiftCode(c *gin.Context) {
 	var newCode models.SwiftCode
 	if err := c.ShouldBindJSON(&newCode); err != nil {
@@ -56,7 +56,7 @@ func AddSwiftCode(c *gin.Context) {
 	c.JSON(http.StatusCreated, newCode)
 }
 
-// Usuwa kod SWIFT
+// Deletes a SWIFT code
 func DeleteSwiftCode(c *gin.Context) {
 	swiftCode := c.Param("swiftCode")
 	for i, code := range swiftCodes {

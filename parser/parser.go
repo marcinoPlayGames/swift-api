@@ -5,7 +5,7 @@ import (
     "os"
     "strings"
 
-    "github.com/marcinoPlayGames/swift-api/models" // Zostawiamy, bo używamy SwiftCode
+    "github.com/marcinoPlayGames/swift-api/models" // Keeping this as we use SwiftCode
 )
 
 func ParseCSV(filename string) ([]models.SwiftCode, error) {
@@ -22,7 +22,7 @@ func ParseCSV(filename string) ([]models.SwiftCode, error) {
     }
 
     var swiftCodes []models.SwiftCode
-    for _, record := range records[1:] { // Pomijamy nagłówki
+    for _, record := range records[1:] { // Skipping headers
         isHeadquarter := strings.HasSuffix(record[0], "XXX")
         swiftCodes = append(swiftCodes, models.SwiftCode{
             SwiftCode:    record[0],

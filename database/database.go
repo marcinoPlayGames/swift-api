@@ -11,7 +11,7 @@ import (
 
 var db *sqlx.DB
 
-// ConnectDB - funkcja łącząca się z bazą danych
+// ConnectDB - function for connecting to the database
 func ConnectDB() {
     var err error
     db, err = sqlx.Connect("postgres", "user=postgres password=admin dbname=swift host=db sslmode=disable")
@@ -20,15 +20,15 @@ func ConnectDB() {
     }
 }
 
-// ExecuteSchema - funkcja wykonująca schema.sql
+// ExecuteSchema - function for executing schema.sql
 func ExecuteSchema() {
-    // Odczytujemy plik schema.sql
+    // Reading the schema.sql file
     data, err := ioutil.ReadFile("schema.sql")
     if err != nil {
         log.Fatal(err)
     }
 
-    // Wykonujemy zapytanie SQL z pliku
+    // Executing the SQL query from the file
     _, err = db.Exec(string(data))
     if err != nil {
         log.Fatal(err)
@@ -37,7 +37,7 @@ func ExecuteSchema() {
     fmt.Println("Schema applied successfully!")
 }
 
-// InsertSwiftCode - funkcja wstawiająca rekord SwiftCode do bazy danych
+// InsertSwiftCode - function for inserting a SwiftCode record into the database
 func InsertSwiftCode(code models.SwiftCode) error {
     query := `INSERT INTO swift_codes (swift_code, bank_name, address, country_iso2, country_name, is_headquarter)
               VALUES (:swift_code, :bank_name, :address, :country_iso2, :country_name, :is_headquarter)`

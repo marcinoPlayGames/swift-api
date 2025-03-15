@@ -1,18 +1,39 @@
-// 1. Test dla endpointu GET /v1/swift-codes/:swiftCode
-// Testowanie, czy zwraca poprawny wynik, kiedy podany swiftCode jest obecny w bazie danych, oraz czy poprawnie obsługuje sytuację, gdy // swiftCode nie istnieje.
+package main
+
+import (
+    "bytes"
+    "encoding/json"
+    "net/http"
+    "net/http/httptest"
+    "testing"
+    "github.com/gin-gonic/gin"
+    "github.com/stretchr/testify/assert"
+    "github.com/marcinoPlayGames/swift-api/handlers"
+    "github.com/marcinoPlayGames/swift-api/models"
+)
+
+/*
+
+Normal unit tests cases
+
+*/
+
+// 1. Test for the GET /v1/swift-codes/:swiftCode endpoint
+// Verifies that the endpoint returns the correct result when the provided swiftCode exists in the database
+// and properly handles the case when the swiftCode does not exist.
 
 func TestGetSwiftCode_Success(t *testing.T) {
-    // Przygotowanie: Tworzymy serwer testowy i dane
+    // Preparation: Set up a test server and test data
     r := gin.Default()
     r.GET("/v1/swift-codes/:swiftCode", handlers.GetSwiftCode)
-    // Dodanie przykładowych danych do testu (np. mockowanie bazy danych)
+    // Add sample data for testing (e.g., mocking the database)
 
     req, _ := http.NewRequest("GET", "/v1/swift-codes/BANKPLPWXXX", nil)
     resp := httptest.NewRecorder()
     r.ServeHTTP(resp, req)
 
     assert.Equal(t, http.StatusOK, resp.Code)
-    // Możesz dodać więcej asercji sprawdzających zwrócone dane
+    // Additional assertions can be added to verify the returned data
 }
 
 func TestGetSwiftCode_NotFound(t *testing.T) {
@@ -24,11 +45,12 @@ func TestGetSwiftCode_NotFound(t *testing.T) {
     r.ServeHTTP(resp, req)
 
     assert.Equal(t, http.StatusNotFound, resp.Code)
-    // Sprawdzanie, czy w odpowiedzi jest komunikat o błędzie
+    // Check if the response contains an appropriate error message
 }
 
-// 2. Test dla endpointu GET /v1/swift-codes/country/:countryISO2code
-// Sprawdzenie, czy zwraca wszystkie kody SWIFT dla danego kraju, oraz co się dzieje, gdy nie ma kodów dla tego kraju.
+// 2. Test for the GET /v1/swift-codes/country/:countryISO2code endpoint
+// Ensures that all SWIFT codes for a given country are correctly retrieved
+// and checks the behavior when there are no codes available for that country.
 
 func TestGetSwiftCodesByCountry_Success(t *testing.T) {
     r := gin.Default()
@@ -39,7 +61,7 @@ func TestGetSwiftCodesByCountry_Success(t *testing.T) {
     r.ServeHTTP(resp, req)
 
     assert.Equal(t, http.StatusOK, resp.Code)
-    // Sprawdzanie, czy odpowiedź zawiera poprawne dane o kodach SWIFT
+    // Verify that the response contains the correct SWIFT code data
 }
 
 func TestGetSwiftCodesByCountry_NotFound(t *testing.T) {
@@ -51,11 +73,11 @@ func TestGetSwiftCodesByCountry_NotFound(t *testing.T) {
     r.ServeHTTP(resp, req)
 
     assert.Equal(t, http.StatusNotFound, resp.Code)
-    // Sprawdzanie, czy odpowiedź zawiera odpowiedni komunikat o błędzie
+    // Verify that the response contains an appropriate error message
 }
 
-// 3. Test dla endpointu POST /v1/swift-codes
-// Testowanie dodawania nowego kodu SWIFT do systemu, w tym sprawdzenie poprawności danych wejściowych i odpowiedzi.
+// 3. Test for the POST /v1/swift-codes endpoint
+// Tests the addition of a new SWIFT code to the system, including validation of input data and response handling.
 
 func TestAddSwiftCode_Success(t *testing.T) {
     r := gin.Default()
@@ -78,14 +100,14 @@ func TestAddSwiftCode_Success(t *testing.T) {
     r.ServeHTTP(resp, req)
 
     assert.Equal(t, http.StatusCreated, resp.Code)
-    // Możesz dodać więcej asercji na sprawdzenie zawartości odpowiedzi
+    // Additional assertions can be added to verify the response content
 }
 
 func TestAddSwiftCode_BadRequest(t *testing.T) {
     r := gin.Default()
     r.POST("/v1/swift-codes", handlers.AddSwiftCode)
 
-    invalidCode := `{ "swiftCode": "BANKINVALIDXXX" }` // Zła struktura
+    invalidCode := `{ "swiftCode": "BANKINVALIDXXX" }` // Invalid data structure
     req, _ := http.NewRequest("POST", "/v1/swift-codes", bytes.NewReader([]byte(invalidCode)))
     req.Header.Set("Content-Type", "application/json")
 
@@ -95,8 +117,8 @@ func TestAddSwiftCode_BadRequest(t *testing.T) {
     assert.Equal(t, http.StatusBadRequest, resp.Code)
 }
 
-// 4. Test dla endpointu DELETE /v1/swift-codes/:swiftCode
-// Sprawdzenie, czy usuwanie kodu SWIFT działa poprawnie i jak aplikacja reaguje na nieistniejący kod.
+// 4. Test for the DELETE /v1/swift-codes/:swiftCode endpoint
+// Checks if the SWIFT code deletion works correctly and how the application reacts when deleting a non-existent code.
 
 func TestDeleteSwiftCode_Success(t *testing.T) {
     r := gin.Default()
@@ -120,16 +142,22 @@ func TestDeleteSwiftCode_NotFound(t *testing.T) {
     assert.Equal(t, http.StatusNotFound, resp.Code)
 }
 
-// 5. Testowanie za krótkiego i za długiego kodu SWIFT w danych wejściowych
-// Test sprawdza, czy system poprawnie reaguje na próby dodania kodu SWIFT, 
-// który jest zbyt krótki lub zbyt długi (niezgodny z wymaganiami formatu).
+/*
+
+Edge cases unit tests
+
+*/
+
+// 1. Testing excessively short and long SWIFT codes in input data
+// Ensures that the system correctly handles attempts to add a SWIFT code
+// that is either too short or too long (not conforming to the required format).
 
 func TestAddSwiftCode_ShortSwiftCode(t *testing.T) {
     r := gin.Default()
     r.POST("/v1/swift-codes", handlers.AddSwiftCode)
 
     invalidCode := models.SwiftCode{
-        SwiftCode:  "BANK", // Za krótki kod SWIFT
+        SwiftCode:  "BANK", // Too short SWIFT code
         BankName:   "Bank Nowy",
         Address:    "Kraków",
         CountryISO2: "PL",
@@ -152,7 +180,7 @@ func TestAddSwiftCode_LongSwiftCode(t *testing.T) {
     r.POST("/v1/swift-codes", handlers.AddSwiftCode)
 
     invalidCode := models.SwiftCode{
-        SwiftCode:  "BANKNEWVERYLONGCODE12345", // Za długi kod SWIFT
+        SwiftCode:  "BANKNEWVERYLONGCODE12345", // Too long SWIFT code
         BankName:   "Bank Nowy",
         Address:    "Kraków",
         CountryISO2: "PL",
@@ -170,9 +198,9 @@ func TestAddSwiftCode_LongSwiftCode(t *testing.T) {
     assert.Equal(t, http.StatusBadRequest, resp.Code)
 }
 
-// 6. Testowanie wielokrotnego dodawania tego samego kodu SWIFT
-// Test sprawdza, czy system poprawnie obsługuje próbę dodania tego samego kodu SWIFT 
-// więcej niż raz, zwracając odpowiedni status 409 Conflict, jeśli kod już istnieje w systemie.
+// 2. Testing multiple additions of the same SWIFT code
+// Ensures that the system correctly handles attempts to add the same SWIFT code
+// more than once, returning a 409 Conflict status if the code already exists in the system.
 
 func TestAddSwiftCode_Duplicate(t *testing.T) {
     r := gin.Default()
@@ -196,39 +224,40 @@ func TestAddSwiftCode_Duplicate(t *testing.T) {
 
     assert.Equal(t, http.StatusCreated, resp.Code)
 
-    // Próba dodania tego samego kodu ponownie
+    // Attempting to add the same code again
     resp2 := httptest.NewRecorder()
     r.ServeHTTP(resp2, req)
 
-    assert.Equal(t, http.StatusConflict, resp2.Code) // Zwraca 409 Conflict jeśli już istnieje
+    assert.Equal(t, http.StatusConflict, resp2.Code) // Returns 409 Conflict if it already exists
 }
 
-// 7. Brak danych / Nieistniejący rekord
-// Testowanie sytuacji, gdy użytkownik próbuje uzyskać dostęp do kodu SWIFT, który nie istnieje w bazie danych.
+// 3. Missing data / Non-existent record
+// Tests how the system responds when a user tries to access a SWIFT code
+// that does not exist in the database.
 
-func TestGetSwiftCode_NotFound(t *testing.T) {
+func TestGetSwiftCode2_NotFound(t *testing.T) {
     r := gin.Default()
     r.GET("/v1/swift-codes/:swiftCode", handlers.GetSwiftCode)
 
-    // Używamy nieistniejącego kodu SWIFT
+    // Using a non-existent SWIFT code
     req, _ := http.NewRequest("GET", "/v1/swift-codes/INVALIDCODE", nil)
     resp := httptest.NewRecorder()
     r.ServeHTTP(resp, req)
 
-    // Sprawdzamy, czy zwrócono status 404 Not Found
+    // Checking if a 404 Not Found status is returned
     assert.Equal(t, http.StatusNotFound, resp.Code)
-    // Możemy również sprawdzić treść odpowiedzi, np. komunikat o błędzie
+    // The response body can also be checked for an error message
 }
 
-// 8. Nieprawidłowy format danych wejściowych
-// Testowanie sytuacji, gdzie dane wejściowe mają niepoprawny format, np. zły JSON lub brak wymaganych pól.
+// 4. Invalid input data format
+// Tests cases where input data is in an incorrect format, such as invalid JSON or missing required fields.
 
 func TestAddSwiftCode_BadRequest_InvalidJSON(t *testing.T) {
     r := gin.Default()
     r.POST("/v1/swift-codes", handlers.AddSwiftCode)
 
     // Niepoprawny JSON (brakująca część struktury)
-    invalidCode := `{ "swiftCode": "BANKINVALID" }` // Brak wymaganych pól, np. BankName
+    invalidCode := `{ "swiftCode": "BANKINVALID" }` // Invalid JSON (missing structure part)
 
     req, _ := http.NewRequest("POST", "/v1/swift-codes", bytes.NewReader([]byte(invalidCode)))
     req.Header.Set("Content-Type", "application/json")
@@ -236,18 +265,18 @@ func TestAddSwiftCode_BadRequest_InvalidJSON(t *testing.T) {
     resp := httptest.NewRecorder()
     r.ServeHTTP(resp, req)
 
-    // Sprawdzamy, czy zwrócono status 400 Bad Request
+    // Checking if a 400 Bad Request status is returned
     assert.Equal(t, http.StatusBadRequest, resp.Code)
-    // Można dodać również sprawdzenie treści odpowiedzi
+    // The response body content can also be checked
 }
 
 func TestAddSwiftCode_BadRequest_InvalidData(t *testing.T) {
     r := gin.Default()
     r.POST("/v1/swift-codes", handlers.AddSwiftCode)
 
-    // Niepoprawne dane, np. kod SWIFT z niewłaściwą długością
+    // Invalid data, e.g., SWIFT code with an incorrect length
     invalidCode := models.SwiftCode{
-        SwiftCode:  "BANK", // Za krótki kod SWIFT
+        SwiftCode:  "BANK", // Too short SWIFT code
         BankName:   "Bank Nowy",
         Address:    "Kraków",
         CountryISO2: "PL",
@@ -262,73 +291,74 @@ func TestAddSwiftCode_BadRequest_InvalidData(t *testing.T) {
     resp := httptest.NewRecorder()
     r.ServeHTTP(resp, req)
 
-    // Sprawdzamy, czy zwrócono status 400 Bad Request
+    // Checking if a 400 Bad Request status is returned
     assert.Equal(t, http.StatusBadRequest, resp.Code)
 }
 
-// 9. Złe parametry w URL
-// Testowanie sytuacji, w której użytkownik poda niepoprawne parametry w URL, np. nieistniejący kraj lub błędny kod SWIFT.
+// 5. Incorrect URL parameters
+// Tests cases where a user provides incorrect parameters in the URL,
+// such as a non-existent country or an invalid SWIFT code.
 
 func TestGetSwiftCodesByCountry_InvalidCountryISO2(t *testing.T) {
     r := gin.Default()
     r.GET("/v1/swift-codes/country/:countryISO2code", handlers.GetSwiftCodesByCountry)
 
-    // Używamy nieistniejącego kraju
+    // Using a non-existent country
     req, _ := http.NewRequest("GET", "/v1/swift-codes/country/XYZ", nil)
     resp := httptest.NewRecorder()
     r.ServeHTTP(resp, req)
 
-    // Sprawdzamy, czy zwrócono status 404 Not Found
+    // Checking if a 404 Not Found status is returned
     assert.Equal(t, http.StatusNotFound, resp.Code)
-    // Można także sprawdzić treść odpowiedzi, np. komunikat o błędzie
+    // The response body content can also be checked for an error message
 }
 
 func TestGetSwiftCode_InvalidSwiftCode(t *testing.T) {
     r := gin.Default()
     r.GET("/v1/swift-codes/:swiftCode", handlers.GetSwiftCode)
 
-    // Używamy błędnego kodu SWIFT
+    // Using an invalid SWIFT code
     req, _ := http.NewRequest("GET", "/v1/swift-codes/INVALIDCODE", nil)
     resp := httptest.NewRecorder()
     r.ServeHTTP(resp, req)
 
-    // Sprawdzamy, czy zwrócono status 404 Not Found
+    // Checking if a 404 Not Found status is returned
     assert.Equal(t, http.StatusNotFound, resp.Code)
-    // Można także sprawdzić treść odpowiedzi
+    // The response body content can also be checked
 }
 
-// 10. Błędne dane wejściowe w zapytaniach
-// Testowanie nieoczekiwanych danych wejściowych, np. tekst HTML zamiast JSON, co może prowadzić do błędów.
+// 6. Invalid input data in requests
+// Tests unexpected input data, such as HTML instead of JSON, which could cause errors.
 
 func TestAddSwiftCode_InvalidContentType(t *testing.T) {
     r := gin.Default()
     r.POST("/v1/swift-codes", handlers.AddSwiftCode)
 
-    // Wysyłamy HTML zamiast JSON
+    // Sending HTML instead of JSON
     invalidContent := "<html><body>Error</body></html>"
     req, _ := http.NewRequest("POST", "/v1/swift-codes", bytes.NewReader([]byte(invalidContent)))
-    req.Header.Set("Content-Type", "text/html") // Zły nagłówek Content-Type
+    req.Header.Set("Content-Type", "text/html") // Incorrect Content-Type header
 
     resp := httptest.NewRecorder()
     r.ServeHTTP(resp, req)
 
-    // Sprawdzamy, czy zwrócono status 415 Unsupported Media Type
+    // Checking if a 415 Unsupported Media Type status is returned
     assert.Equal(t, http.StatusUnsupportedMediaType, resp.Code)
-    // Można także sprawdzić treść odpowiedzi
+    // The response body content can also be checked
 }
 
 func TestGetSwiftCode_InvalidRequestBody(t *testing.T) {
     r := gin.Default()
     r.GET("/v1/swift-codes/:swiftCode", handlers.GetSwiftCode)
 
-    // Wysyłamy pusty request body (chociaż endpoint GET nie powinien go wymagać)
+    // Sending an empty request body (even though the GET endpoint should not require one)
     req, _ := http.NewRequest("GET", "/v1/swift-codes/BANKPLPWXXX", nil)
-    req.Header.Set("Content-Type", "application/json") // Pusty body, ale z Content-Type jako JSON
+    req.Header.Set("Content-Type", "application/json") // Empty body, but with Content-Type set to JSON
 
     resp := httptest.NewRecorder()
     r.ServeHTTP(resp, req)
 
-    // Sprawdzamy, czy odpowiedź jest poprawna, nawet bez ciała
+    // Checking if the response is valid even without a request body
     assert.Equal(t, http.StatusOK, resp.Code)
-    // Możemy również sprawdzić, czy nie wystąpił żaden błąd w odpowiedzi
+    // Also, ensuring that no errors occur in the response
 }
