@@ -1,11 +1,11 @@
 CREATE TABLE swift_codes (
     id SERIAL PRIMARY KEY,
-    swift_code VARCHAR(11) UNIQUE NOT NULL,
-    bank_name VARCHAR(255) NOT NULL,
-    country_iso2 CHAR(2) NOT NULL,
-    country_name VARCHAR(255) NOT NULL,
-    address TEXT NOT NULL,
-    is_headquarter BOOLEAN NOT NULL
+    swift_code VARCHAR(255) NOT NULL,
+    bank_name VARCHAR(255),
+    address TEXT,
+    country_iso2 VARCHAR(2),
+    country_name VARCHAR(255),
+    is_headquarter BOOLEAN
 );
 
 CREATE INDEX idx_swift_code ON swift_codes (swift_code);

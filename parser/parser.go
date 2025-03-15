@@ -5,7 +5,7 @@ import (
     "os"
     "strings"
 
-    "github.com/marcinoPlayGames/swift-api/models"
+    "github.com/marcinoPlayGames/swift-api/models" // Zostawiamy, bo używamy SwiftCode
 )
 
 func ParseCSV(filename string) ([]models.SwiftCode, error) {
